@@ -8,7 +8,7 @@ group = "com.test"
 version = "0.0.1"
 
 application {
-    mainClass = "io.ktor.server.netty.EngineMain"
+    mainClass = "com.test.ApplicationKt"
 }
 
 dependencies {
@@ -21,4 +21,15 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
     implementation(libs.postgresql)
     implementation(libs.hikari)
+}
+
+tasks.register<Jar>("fatJar") {
+    archiveBaseName.set("ktor-practice")
+    archiveVersion.set("0.0.1")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes["Main-Class"] = "com.test.ApplicationKt"
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    with(tasks.jar.get() as CopySpec)
 }
