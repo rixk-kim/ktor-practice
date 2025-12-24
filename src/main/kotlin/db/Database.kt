@@ -1,7 +1,6 @@
 
 package com.test.db
 
-import com.test.db.Users.id
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.*
@@ -16,7 +15,9 @@ object Users: Table() {
 
 fun initDatabase() {
     val dbUrl = System.getenv("DATABASE_URL")
-    println("Database url: $dbUrl")
+    val testVar = System.getenv("TEST_VAR")
+    println("DATABASE_URL: $dbUrl")
+    println("TEST_VAR: $testVar")
 
     val dataSource = if (dbUrl != null) {
         val regex = Regex("postgresql://(.+):(.+)@(.+):(\\d+)/(.+)")
