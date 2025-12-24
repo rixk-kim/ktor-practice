@@ -14,8 +14,10 @@ object Users: Table() {
 }
 
 fun initDatabase() {
-    val dbUrl = System.getenv("DATABASE_URL")
-    val testVar = System.getenv("TEST_VAR")
+    val dbUrl = /*System.getenv("DATABASE_URL")*/
+
+        "postgres:ADjBovipIucWtyejVtBWoDSFfRvrwjsr@postgres.railway.internal:5432/railway"
+         val testVar = System.getenv("TEST_VAR")
     println("DATABASE_URL: $dbUrl")
     println("TEST_VAR: $testVar")
 
