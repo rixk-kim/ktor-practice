@@ -21,6 +21,12 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
     implementation(libs.postgresql)
     implementation(libs.hikari)
+
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.sqlite.jdbc)
+
 }
 
 tasks.register<Jar>("fatJar") {

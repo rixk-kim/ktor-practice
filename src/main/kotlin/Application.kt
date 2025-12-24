@@ -1,6 +1,6 @@
 package com.test
 
-import com.test.db.Database
+import com.test.db.initDatabase
 import com.test.plugins.configureSerialization
 import com.test.routes.configureRouting
 import io.ktor.server.application.*
@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    Database.init(environment)
+    initDatabase()
     configureSerialization()
     configureRouting()
 }

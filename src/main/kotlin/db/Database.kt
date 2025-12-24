@@ -1,21 +1,32 @@
 
 package com.test.db
 
+import com.test.db.Users.id
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.server.application.*
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 
-object Database {
-    lateinit var dataSource: HikariDataSource
 
-    fun init(environment: ApplicationEnvironment) {
-        val dbConfig = environment.config.config("ktor.database")
-        val config = HikariConfig().apply {
-            jdbcUrl = "jdbc:postgresql://${dbConfig.property("host").getString()}:${dbConfig.property("port").getString()}/${dbConfig.property("name").getString()}"
-            username = dbConfig.property("user").getString()
-            password = dbConfig.property("password").getString()
-            maximumPoolSize = 10
-        }
-        dataSource = HikariDataSource(config)
+object Users: Table() {
+    val id = integer("id").autoIncrement()
+    val name = varchar("name", 50)
+    override val primaryKey = PrimaryKey(id)
+}
+
+fun initDatabase() {
+    val config = HikariConfig().apply {
+        jdbcUrl = "jdbc:postgresql://localhost:5432/postgres"
+        driverClassName = "org.postgresql.Driver"
+        username = "plnc_sy"
+        password = ""
+        maximumPoolSize = 10
+    }
+    val dataSource = HikariDataSource(config)
+
+    Database.connect(dataSource)
+
+    transaction {
+        SchemaUtils.create(Users)
     }
 }
