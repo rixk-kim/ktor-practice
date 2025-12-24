@@ -15,14 +15,33 @@ object Users: Table() {
 }
 
 fun initDatabase() {
-    val config = HikariConfig().apply {
-        jdbcUrl = "jdbc:postgresql://localhost:5432/postgres"
-        driverClassName = "org.postgresql.Driver"
-        username = "plnc_sy"
-        password = ""
-        maximumPoolSize = 10
+    val dbUrl = System.getenv("DATABSE_URL")
+
+    val dataSource = if (dbUrl != null) {
+        val regex = Regex("postgresql://(.+):(.+)@(.+):(\\d+)/(.+)")
+        val match = regex.find(dbUrl)!!
+        val (user, password, host, port, database) = match.destructured
+
+        HikariConfig().apply {
+            jdbcUrl = "jdbc:postgresql://$host:$port/$database"
+            driverClassName = "org.postgresql.Driver"
+            username = user
+            this.password = password
+            maximumPoolSize = 5
+        }.let {
+            HikariDataSource(it)
+        }
+    } else {
+        HikariConfig().apply {
+            jdbcUrl = "jdbc:postgresql://localhost:5432/testdb"
+            driverClassName = "org.postgresql.Driver"
+            username = "plnc_sy"
+            password = ""
+            maximumPoolSize = 5
+        }.let {
+            HikariDataSource(it)
+        }
     }
-    val dataSource = HikariDataSource(config)
 
     Database.connect(dataSource)
 
