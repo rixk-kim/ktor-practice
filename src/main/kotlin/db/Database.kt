@@ -16,6 +16,7 @@ object Users: Table() {
 
 fun initDatabase() {
     val dbUrl = System.getenv("DATABASE_URL")
+    println("Database url: $dbUrl")
 
     val dataSource = if (dbUrl != null) {
         val regex = Regex("postgresql://(.+):(.+)@(.+):(\\d+)/(.+)")
