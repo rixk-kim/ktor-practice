@@ -15,14 +15,14 @@ object Users: Table() {
 
 fun initDatabase() {
     val dbUrl = System.getenv("DATABASE_URL")
-        ?: "postgresql://postgres:ADjBovipIucWtyejVtBWoDSFfRvrwjsr@postgres.railway.internal:5432/railway"
+//        ?: "postgresql://postgres:ADjBovipIucWtyejVtBWoDSFfRvrwjsr@postgres.railway.internal:5432/railway"
 //    val dbUrl = "postgresql://postgres:ADjBovipIucWtyejVtBWoDSFfRvrwjsr@postgres.railway.internal:5432/railway"
          val testVar = System.getenv("TEST_VAR")
     println("DATABASE_URL: $dbUrl")
     println("TEST_VAR: $testVar")
 
     val dataSource = if (dbUrl != null) {
-        val regex = Regex("postgre(?:ql)?://(.+):(.+)@(.+):(\\d+)/(.+)")
+        val regex = Regex("postgres(?:ql)?://(.+):(.+)@(.+):(\\d+)/(.+)")
         val match = regex.find(dbUrl)!!
         val (user, password, host, port, database) = match.destructured
 
