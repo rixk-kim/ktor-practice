@@ -15,7 +15,7 @@ object Users: Table() {
 
 fun initDatabase() {
     val dbUrl = System.getenv("DATABASE_URL")
-//        ?: "postgresql://postgres:ADjBovipIucWtyejVtBWoDSFfRvrwjsr@postgres.railway.internal:5432/railway"
+        ?: "postgresql://postgres:ADjBovipIucWtyejVtBWoDSFfRvrwjsr@postgres.railway.internal:5432/railway"
 //    val dbUrl = "postgresql://postgres:ADjBovipIucWtyejVtBWoDSFfRvrwjsr@postgres.railway.internal:5432/railway"
          val testVar = System.getenv("TEST_VAR")
     println("DATABASE_URL: $dbUrl")
