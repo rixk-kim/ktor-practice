@@ -53,7 +53,7 @@ fun initDatabase() {
     Database.connect(dataSource)
 
     transaction {
-        SchemaUtils.drop(Users)
+//        SchemaUtils.drop(Users)
         SchemaUtils.create(Users)
     }
 }

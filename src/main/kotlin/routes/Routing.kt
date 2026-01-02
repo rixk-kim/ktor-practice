@@ -34,7 +34,7 @@ fun Application.configureRouting() {
                 Users.selectAll().map { User(
                     id = it[Users.id],
                     name = it[Users.name],
-                    email = it[Users.name],
+                    email = it[Users.email],
                     age = it[Users.age]
                     )
                 }
