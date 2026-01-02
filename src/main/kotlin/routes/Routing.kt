@@ -1,6 +1,8 @@
 package com.test.routes
 
 import com.test.db.Users
+import com.test.db.Users.age
+import com.test.db.Users.email
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -12,12 +14,30 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
-data class User(val id: Int? = null, val name: String)
+data class User(
+    val id: Int? = null,
+    val name: String,
+    val email: String? = null,
+    val age: Int? = null
+)
+
+@Serializable
+data class UserPatch(
+    val name: String? = null,
+    val email: String? = null,
+    val age: Int? = null
+)
 fun Application.configureRouting() {
     routing {
         get("/users") {
             val users = transaction {
-                Users.selectAll().map { User(it[Users.id], it[Users.name]) }
+                Users.selectAll().map { User(
+                    id = it[Users.id],
+                    name = it[Users.name],
+                    email = it[Users.name],
+                    age = it[Users.age]
+                    )
+                }
             }
             call.respond(users)
         }
@@ -31,7 +51,14 @@ fun Application.configureRouting() {
 
             val user = transaction {
                 Users.select { Users.id eq id }
-                    .map { User(it[Users.id], it[Users.name])}
+                    .map {
+                        User(
+                            it[Users.id],
+                            it[Users.name],
+                            email = it[Users.email],
+                            age = it[Users.age]
+                        )
+                    }
                     .singleOrNull()
             }
 
@@ -47,9 +74,14 @@ fun Application.configureRouting() {
             val id = transaction {
                 Users.insert {
                     it[name] = user.name
+                    it[email] = user.email
+                    it[age] = user.age
                 } get Users.id
             }
-            call.respond(HttpStatusCode.Created, User(id, user.name))
+            call.respond(
+                HttpStatusCode.Created,
+                User(id = id, name = user.name, email = user.email, age = user.age)
+            )
         }
 
         put("/users/{id}") {
@@ -63,13 +95,49 @@ fun Application.configureRouting() {
             val updated = transaction {
                 Users.update({ Users.id eq id }) {
                     it[name] = user.name
+                    it[email] = user.email
+                    it[age] = user.age
                 }
             }
 
             if (updated == 0) {
                 call.respond(HttpStatusCode.NotFound, "user not found")
             } else {
-                call.respond(User(id, user.name))
+                call.respond(User(id = id, name = user.name, email = user.email, age = user.age))
+            }
+        }
+
+        patch("/users/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull()
+            if (id == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid Id")
+                return@patch
+            }
+
+            val patch = call.receive<User>()
+            val updated = transaction {
+                Users.update({ Users.id eq id }) {
+                    patch.name?.let { name -> it[Users.name] = name }
+                    patch.email?.let { email -> it[Users.email] = email }
+                    patch.age?.let { age -> it[Users.age] = age }
+                }
+            }
+
+            if (updated == 0) {
+                call.respond(HttpStatusCode.NotFound)
+            } else {
+                val updatedUser = transaction {
+                    Users.select { Users.id eq id }
+                        .map { User(
+                            id = it[Users.id],
+                            name = it[Users.name],
+                            email = it[Users.email],
+                            age = it[Users.age]
+                        )
+                        }
+                        .single()
+                }
+                call.respond(updatedUser)
             }
         }
 
@@ -91,30 +159,9 @@ fun Application.configureRouting() {
             }
         }
 
-        patch("/users/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull()
-            if (id == null) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid Id")
-                return@patch
-            }
-
-            val user = call.receive<User>()
-            val updated = transaction {
-                Users.update({ Users.id eq id }) {
-                    it[name] = user.name
-                }
-            }
-
-            if (updated == 0) {
-                call.respond(HttpStatusCode.NotFound)
-            } else {
-                val updatedUser = transaction {
-                    Users.select { Users.id eq id }
-                    .map { User(it[Users.id], it[Users.name]) }
-                        .single()
-                }
-                call.respond(updatedUser)
-            }
+        options("/users/{id?}") {
+            call.response.header("Allow", "GET, POST, PATCH, DELETE, OPTIONS")
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

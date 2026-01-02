@@ -10,6 +10,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object Users: Table() {
     val id = integer("id").autoIncrement()
     val name = varchar("name", 50)
+    val email = varchar("email", 100).nullable()
+    val age = integer("age").nullable()
+
     override val primaryKey = PrimaryKey(id)
 }
 
